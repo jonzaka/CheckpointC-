@@ -149,4 +149,39 @@ public class FileService
 
     public string ExportOrdensToJson(string outDir = "export")
     {
-        Directory.Creat
+        Directory.CreateDirectory(outDir);
+        var items = _crud.ListOrdens().Select(o => new OrdemDto
+        {
+            Id = o.Id,
+            ClienteId = o.ClienteId,
+            Ticker = o.Ativo?.Ticker ?? "",
+            Tipo = o.Tipo,
+            Quantidade = o.Quantidade,
+            Preco = o.Preco,
+            Data = o.Data
+        }).ToList();
+        var json = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true });
+        var path = Path.Combine(outDir, $"ordens_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+        File.WriteAllText(path, json);
+        return path;
+    }
+}
+
+public class ClienteDto
+{
+    public string Nome { get; set; } = string.Empty;
+    public string CPF { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public int? AssessorId { get; set; }
+}
+
+public class OrdemDto
+{
+    public int Id { get; set; }
+    public int ClienteId { get; set; }
+    public string Ticker { get; set; } = string.Empty;
+    public string Tipo { get; set; } = "COMPRA";
+    public int Quantidade { get; set; }
+    public decimal Preco { get; set; }
+    public DateTime Data { get; set; }
+}
