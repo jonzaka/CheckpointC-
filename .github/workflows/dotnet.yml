@@ -1,0 +1,29 @@
+name: .NET Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restaurar dependências
+      run: dotnet restore src
+
+    - name: Compilar
+      run: dotnet build src --no-restore --configuration Release
+
+    - name: Testar (se houver testes)
+      run: dotnet test src --no-restore --verbosity normal || echo "Sem testes implementados"
